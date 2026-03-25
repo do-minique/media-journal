@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<!-- This page shows a list of the created media entries -->
+<head>
+  <link rel="stylesheet" href="/static/main.css">
+  <title>Media</title>
+</head>
+
+<body>
+  <div class="nav">
+<!-- User can navigate back to the home page-->
+      <p>
+    <a href="/">Home</a>
+  </p>
+  </div>
+  <div class="content">
+        <p>
+    {% for entry in entries %}
+  <p class="entries"> 
+    {{ entry.name }} {{ entry.release_year }} 
+    {{ entry.description }} {{ entry.mediatype_name }}
+    {{ entry.date_added }} {{ entry.adder_username }}
+  </p>
+    {% if session.get("user_id") and entry.adder_id == session.get("user_id") %}
+  <p>
+    <a href="/edit/{{ entry.id }}">Edit</a> |
+    <a href="/remove/{{ entry.id }}">Remove</a>
+  </p>
+  {% endif %}
+  {% endfor %}
+
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<!-- This page allows logged in users to edit entries -->
+<head>
+  <link rel="stylesheet" href="/static/main.css">
+  <title>Edit entry</title>
+</head>
+
+<body>
+  <div class="nav">
+<!-- User can navigate back to the home page-->
+      <p>
+    <a href="/">Cancel</a>
+  </p>
+  </div>
+  <div class="content">
+<!-- Form for editing entries-->
+  <form action="/edit/{{ entry.id }}" method="post">
+    <p>
+      Name:
+      <input type="text" name="name" value="{{ entry.name }}" required/>
+    </p>
+    <p>
+      <input type="radio" name="mediatype_id" value="1" {% if entry.mediatype_id == 1 %}checked{% endif %} required/> Book
+      <input type="radio" name="mediatype_id" value="2" {% if entry.mediatype_id == 2 %}checked{% endif %}/> Movie
+      <input type="radio" name="mediatype_id" value="3" {% if entry.mediatype_id == 3 %}checked{% endif %}/> TV show
+    </p>
+    <p>
+      Release year:
+      <input type="text" name="release_year" value="{{ entry.release_year }}" required/>
+    </p>
+    <p>
+      Description:
+      <input type="text" name="description" value="{{ entry.description }}" required/>
+    </p>
+    <input type="submit" value="Save changes" />
+  </form>
+  </div>
+</body>
+
+</html>

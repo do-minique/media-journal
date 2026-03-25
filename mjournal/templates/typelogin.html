@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="/static/main.css">
+  <title>Log In</title>
+</head>
+
+<body>
+    <div class="nav">
+<!-- User can navigate back to the home page-->
+      <p>
+    <a href="/">Home</a>
+  </p>
+  </div>
+  <div class="container">
+    {% if session.username %}
+    <p>
+      You are logged in as {{ session.username }}
+    </p>
+    <p>
+      <a href="/logout">Log out</a>
+    </p>
+    {% else %}
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form action="/login" method="post">
+      <p>
+        Username: <br />
+        <input type="text" name="username" />
+      </p>
+      <p>
+        Password: <br />
+        <input type="password" name="password" />
+      </p>
+      <input type="submit" value="Log in" />
+    </form>
+
+    <p>
+      <a href="/register">Create an account</a>
+    </p>
+    {% endif %}
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/static/main.css">
+  <title>Search</title>
+</head>
+<body>
+  <div class="nav">
+<!-- User can navigate back to the home page-->
+      <p>
+    <a href="/">Home</a>
+  </p>
+  </div>
+    <form action="/search" method="get">
+        <input type="text" name="query" value="{{ query }}" placeholder="...">
+        <button type="submit">Search</button>
+    </form>
+
+    {% if query %}
+        {% if entries %}
+            <ul>
+                {% for entry in entries %}
+                    <li>
+                        <strong>{{ entry.name }}</strong> ({{ entry.release_year }})<br>
+                        Type: {{ entry.mediatype_name }}<br>
+                        Description: {{ entry.description }}<br>
+                        Added by user: {{ entry.adder_username }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No results</p>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
