@@ -81,3 +81,50 @@ def search_entries(query):
     """
     like_query = "%" + query + "%"
     return db.query(sql, (like_query, like_query, like_query, like_query, like_query))
+
+def get_reviews_permedia(media_id):
+    sql = """
+        SELECT
+            Reviews.id,
+            Reviews.media_id,
+            Reviews.user_id,
+            Reviews.rating,
+            Reviews.comment,
+            Reviews.date_added,
+            Users.username
+        FROM Reviews
+        JOIN Users ON Reviews.user_id = Users.id
+        WHERE Reviews.media_id = ?
+        ORDER BY Reviews.date_added DESC
+    """
+    return db.query(sql, [media_id])
+
+def get_review(review_id):
+    sql = """
+        SELECT
+            Reviews.id,
+            Reviews.media_id,
+            Reviews.user_id,
+            Reviews.rating,
+            Reviews.comment,
+            Reviews.date_added,
+            Users.username
+        FROM Reviews
+        JOIN Users ON Reviews.user_id = Users.id
+        WHERE Reviews.id = ?
+    """
+    result = db.query(sql, (review_id,))
+    return result[0] if result else None
+
+def update_review(review_id, comment, rating):
+    sql = """
+        UPDATE Media
+        SET comment = ?, 
+            rating = ?, 
+        WHERE id = ?
+    """
+    db.execute(sql, (comment, rating, review_id))
+
+def delete_review(review_id):
+    sql = "DELETE FROM Reviews WHERE id = ?"
+    db.execute(sql, [review_id])

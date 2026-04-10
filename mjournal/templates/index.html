@@ -41,7 +41,9 @@
       <a href="/search">Search</a>
     </p>
     <p>
+      {% if session.user_id %}
       <a href="/add">Add entry</a>
+      {% endif %}
     </p>
   </div>
 </body>

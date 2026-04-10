@@ -15,7 +15,7 @@ With Media Journal, users can create a list of movies and series they have watch
 
 ### Current status
 
-In this version, users can create an account and log in, add items when logged in, edit or delete the items they have added, and browse items added by all users. 
+In this version, users can create an account and log in, add items when logged in, edit or delete the items they have added, and browse items added by all users. Users can also add/edit/remove reviews.
 
 ### Known limitations
 
@@ -29,7 +29,6 @@ Before you begin, make sure you have the following installed:
 - Flask
 - SQLite
 
-
 Testing the application requires first setting up a database on your local machine.
 
 The database schema is stored in the file `schema.sql`. Create the database in a file named `database.db` as follows:
@@ -39,28 +38,10 @@ $ sqlite3 database.db < schema.sql
 ```
 
 
-Sessions require a secret key to be defined in the application. The application uses this secret key to securely store session-related data in the user's browser as a cookie.
-
-Copy the file `config.example.py` to `config.py` and save your generated secret key there.
-
-You can generate a key, for example, as follows:
-```bash
-$ python3
->>> import secrets
->>> secrets.token_hex(16)
-'copy-this-to-your-config-py'
-```
-
-
-### For  running the application locally, create and activate a virtual environment
+### Run the application locally
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-
 flask run
 
-Deactivate venv when done:
-deactivate
 
 

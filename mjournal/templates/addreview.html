@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<!-- This page allows logged in users to add new reviews -->
+<head>
+  <link rel="stylesheet" href="/static/main.css">
+  <title>Add entry</title>
+</head>
+
+<body>
+  <div class="nav">
+<!-- User can navigate back to the home page-->
+      <p>
+    <a href="/">Cancel</a>
+  </p>
+  </div>
+  <div>
+    <h1>{{ entry.name }}</h1>
+  </div>
+  <div class="content">
+<!-- Form for adding entries-->
+  <form action="/addreview/{{ entry.id }}" method="post">
+    <p>
+      <label for="rating">Rating</label>
+<select name="rating" id="rating" required>
+  <option value="" disabled selected>Select rating</option>
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+</select>
+    <p>
+<textarea rows="10" cols="50" name="comment" required placeholder="Write your review here"></textarea>
+
+    </p>
+    <input type="submit" value="Submit" />
+  </form>
+  </div>
+</body>
+
+</html>

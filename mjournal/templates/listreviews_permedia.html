@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<!-- This page shows a list of reviews added to each media -->
+<head>
+  <link rel="stylesheet" href="/static/main.css">
+  <title>Reviews</title>
+</head>
+
+<body>
+  <div class="nav">
+<!-- User can navigate back to the home page-->
+      <p>
+    <a href="/">Home</a>
+  </p>
+  </div>
+  <div class="content">
+    {% for review in reviews %}
+  <p class="entries"> 
+    {{ review.username }} {{ review.rating }}/10
+    {{ review.comment }} {{ review.date_added }} 
+  </p>
+      {% if session.get("user_id") and review.user_id == session.get("user_id") %}
+  <p>
+    <a href="/editreview/{{ review.id }}">Edit</a> |
+    <a href="/removereview/{{ review.id }}">Remove</a>
+  </p>
+  {% endif %}
+  {% endfor %}
+
+  </div>
+</body>
+
+</html>

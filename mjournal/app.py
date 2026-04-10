@@ -174,4 +174,82 @@ def search():
         entries = []
 
     return render_template("search.html", query=query, entries=entries)
+
+@app.route("/addreview/<int:entry_id>", methods=["GET", "POST"])
+def add_review(entry_id):
+    entry = dbfunctions.get_entry(entry_id)
+    if session.get("user_id") is None:
+        abort(403)
+    if request.method == "GET":
+        return render_template("addreview.html",entry=entry)
+    if request.method == "POST":
+        entry_rating = request.form["rating"]
+        entry_comment = request.form["comment"]
+        added_by_user = session["user_id"]
+
+        if not entry_rating or not entry_comment:
+            return "All fields are required"
+
+        try:
+            sql = """
+                INSERT INTO Reviews
+                (media_id, user_id, rating, comment, date_added)
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+            """
+            db.execute(sql, [entry_id, added_by_user, entry_rating, entry_comment])
+
+            flash("Review entry added successfully")
+            return redirect(url_for("index"))
         
+        except sqlite3.IntegrityError:
+            abort(403)
+
+        except Exception as e:
+            flash(f"Error: {e}")
+            return redirect(url_for("show_media"))
+        
+@app.route("/listreviews_permedia/<int:entry_id>")
+def show_reviews(entry_id):
+    entry = dbfunctions.get_entry(entry_id)
+    reviews = dbfunctions.get_reviews_permedia(entry_id)
+    if not reviews:
+        abort(404)
+    return render_template("listreviews_permedia.html", reviews=reviews, entry=entry)
+
+@app.route("/editreview/<int:review_id>", methods=["GET", "POST"])
+def edit_review(review_id):
+    review = dbfunctions.get_review(review_id)
+    if not review:
+        abort(404)
+    if session.get("user_id") is None:
+        abort(403)
+    if review["user_id"] != session["user_id"]:
+        abort(403)
+
+    if request.method == "GET":
+        return render_template("editreview.html", review=review)
+ 
+    if request.method == "POST":
+        rating = request.form["rating"]
+        comment = request.form["comment"]
+
+        dbfunctions.update_review(review_id, comment, rating)
+        return redirect(url_for("show_media"))
+
+@app.route("/removereview/<int:review_id>", methods=["GET", "POST"])
+def remove_review(review_id):
+    review = dbfunctions.get_review(review_id)
+    if not review:
+        abort(404)
+    if session.get("user_id") is None:
+        abort(403)
+    if review["user_id"] != session["user_id"]:
+        abort(403)
+
+    if request.method == "GET":
+        return render_template("removereview.html", review=review)
+
+    if request.method == "POST":
+        if "continue" in request.form:
+            dbfunctions.delete_review(review["id"])
+        return redirect(url_for("show_media"))
