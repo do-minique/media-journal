@@ -53,10 +53,10 @@ def delete_entry(entry_id):
     sql = "DELETE FROM Media WHERE id = ?"
     db.execute(sql, [entry_id])
 
-def get_username(user_id):
-    sql = "SELECT username FROM Users WHERE id = ?"
-    result = db.query(sql, (user_id,))
-    return result[0]["username"] if result else None
+def get_user(user_id):
+    sql = "SELECT id, username FROM Users WHERE id = ?"
+    result = db.query(sql, [user_id])
+    return result[0] if result else None
 
 def search_entries(query):
     sql = """
@@ -99,6 +99,34 @@ def get_reviews_permedia(media_id):
     """
     return db.query(sql, [media_id])
 
+def get_reviews_peruser(user_id):
+    sql = """
+        SELECT
+            Reviews.id,
+            Reviews.media_id,
+            Reviews.user_id,
+            Reviews.rating,
+            Reviews.comment,
+            Reviews.date_added,
+            Users.username,
+            Media.name
+        FROM Reviews
+        JOIN Users ON Reviews.user_id = Users.id
+        JOIN Media ON Reviews.media_id = Media.id
+        WHERE Reviews.user_id = ?
+        ORDER BY Reviews.date_added DESC
+    """
+    return db.query(sql, [user_id])
+
+def get_average_rating_peruser(user_id):
+    sql = """
+        SELECT AVG(rating) as avg_rating
+        FROM Reviews
+        WHERE user_id = ?
+    """
+    result = db.query(sql, [user_id])
+    return result[0]["avg_rating"] if result else None
+
 def get_review(review_id):
     sql = """
         SELECT
@@ -128,3 +156,11 @@ def update_review(review_id, comment, rating):
 def delete_review(review_id):
     sql = "DELETE FROM Reviews WHERE id = ?"
     db.execute(sql, [review_id])
+
+def get_users():
+    sql = """
+        SELECT id, username
+        FROM Users
+        ORDER BY username
+    """
+    return db.query(sql)

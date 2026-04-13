@@ -13,10 +13,10 @@ app.secret_key = config.secret_key
 @app.route("/")
 def index():
     user_id = session.get("user_id")
-    username = None
+    user = None
     if user_id:
-        username = dbfunctions.get_username(user_id)
-    return render_template("index.html", username=username)
+        user = dbfunctions.get_user(user_id)
+    return render_template("index.html", user=user)
 
 @app.route("/typelogin")
 def typelogin():
@@ -253,3 +253,17 @@ def remove_review(review_id):
         if "continue" in request.form:
             dbfunctions.delete_review(review["id"])
         return redirect(url_for("show_media"))
+
+@app.route("/user/<int:user_id>")
+def show_user(user_id):
+    user = dbfunctions.get_user(user_id)
+    if not user:
+        abort(404)
+    reviews = dbfunctions.get_reviews_peruser(user_id)
+    avg_rating = dbfunctions.get_average_rating_peruser(user_id)
+    return render_template("user.html", user=user, reviews=reviews, avg_rating=avg_rating)
+
+@app.route("/listusers")
+def list_users():
+    users = dbfunctions.get_users()
+    return render_template("listusers.html", users=users)

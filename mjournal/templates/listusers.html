@@ -16,6 +16,12 @@
   <div class="content">
         <p>
 <!-- Add here a list of links to user profiles-->
+ <h3>Registered users: </h3>
+        {% for user in users %}
+            <li>
+                <a href="/user/{{ user.id }}">{{ user.username }}</a>
+            </li>
+        {% endfor %}
   </p>
 
   </div>

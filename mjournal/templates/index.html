@@ -8,10 +8,11 @@
 <body>
   <div class="top-right">
     {% if session.user_id %}
-      Logged in as {{ username }}
+      Logged in as <a href="/user/{{ user.id }}">{{ user.username }}</a>
     {% else %}
       You are not logged in
     {% endif %}
+
 </div>
   <div class="nav">
     <ul>

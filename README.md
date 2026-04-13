@@ -15,11 +15,11 @@ With Media Journal, users can create a list of movies and series they have watch
 
 ### Current status
 
-In this version, users can create an account and log in, add items when logged in, edit or delete the items they have added, and browse items added by all users. Users can also add/edit/remove reviews.
+In this version, users can create an account and log in, add items when logged in, edit or delete the items they have added, and browse items added by all users. Users can also add/edit/remove reviews. Reviews and statistics can be viewed in user pages.
 
 ### Known limitations
 
-Other features are still under development, so not all links on the main page are functional yet.
+Some other features are still under development.
 
 ### Setup instructions
 
