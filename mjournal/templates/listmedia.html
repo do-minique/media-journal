@@ -20,6 +20,8 @@
     {{ entry.name }} {{ entry.release_year }} 
     {{ entry.description }} {{ entry.mediatype_name }}
     {{ entry.date_added }} 
+      <p>
+        {{ entry.genres if entry.genres else "No genres" }}
   </p>
     {% if session.get("user_id") and entry.adder_id == session.get("user_id") %}
   <p>

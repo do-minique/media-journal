@@ -29,6 +29,14 @@
       Release year:
       <input type="text" name="release_year" value="{{ entry.release_year }}" required/>
     </p>
+    <p>Genres:</p>
+{% for genre in genres %}
+  <label>
+    <input type="checkbox" name="genre_ids" value="{{ genre.id }}"
+      {% if genre.id in selected_genres %}checked{% endif %}>
+    {{ genre.name }}
+  </label><br>
+{% endfor %}
     <p>
       Description:
       <input type="text" name="description" value="{{ entry.description }}" required/>

@@ -1,22 +1,26 @@
 import db
 
+
 def get_entries():
     sql = """
-        SELECT 
+        SELECT
             Media.id,
             Media.name,
-            Media.description,
             Media.release_year,
+            Media.description,
             Media.date_added,
             Media.adder_id,
-            users.username AS adder_username,
-            Mediatypes.name AS mediatype_name
+            Mediatypes.name AS mediatype_name,
+            GROUP_CONCAT(Genres.name, ', ') AS genres
         FROM Media
-        JOIN Users ON Media.adder_id = Users.id
         JOIN Mediatypes ON Media.mediatype_id = Mediatypes.id
+        LEFT JOIN Genrelist ON Media.id = Genrelist.media_id
+        LEFT JOIN Genres ON Genrelist.genre_id = Genres.id
+        GROUP BY Media.id
         ORDER BY Media.date_added DESC
     """
-    return db.query(sql) 
+    return db.query(sql)
+
 
 def get_entry(entry_id):
     sql = """
@@ -58,29 +62,50 @@ def get_user(user_id):
     result = db.query(sql, [user_id])
     return result[0] if result else None
 
-def search_entries(query):
+def search_entries(query="", genre_id=None):
     sql = """
-        SELECT 
+        SELECT
             Media.id,
             Media.name,
-            Media.description,
             Media.release_year,
-            Media.date_added,
-            Media.adder_id,
+            Media.description,
+            Mediatypes.name AS mediatype_name,
             Users.username AS adder_username,
-            Mediatypes.name AS mediatype_name
+            GROUP_CONCAT(Genres.name, ', ') AS genres
         FROM Media
-        JOIN Users ON Media.adder_id = Users.id
         JOIN Mediatypes ON Media.mediatype_id = Mediatypes.id
-        WHERE Media.name LIKE ?
-           OR Media.description LIKE ?
-           OR Media.release_year LIKE ?
-           OR Mediatypes.name LIKE ?
-           OR Users.username LIKE ?
-        ORDER BY Media.date_added DESC
+        JOIN Users ON Media.adder_id = Users.id
+        LEFT JOIN Genrelist ON Media.id = Genrelist.media_id
+        LEFT JOIN Genres ON Genrelist.genre_id = Genres.id
     """
-    like_query = "%" + query + "%"
-    return db.query(sql, (like_query, like_query, like_query, like_query, like_query))
+
+    conditions = []
+    params = []
+
+    if query:
+        conditions.append("(Media.name LIKE ? OR Media.description LIKE ?)")
+        like = "%" + query + "%"
+        params.extend([like, like])
+
+    if genre_id:
+        conditions.append("""
+            Media.id IN (
+                SELECT media_id
+                FROM Genrelist
+                WHERE genre_id = ?
+            )
+        """)
+        params.append(genre_id)
+
+    if conditions:
+        sql += " WHERE " + " AND ".join(conditions)
+
+    sql += """
+        GROUP BY Media.id
+        ORDER BY Media.name
+    """
+
+    return db.query(sql, params)
 
 def get_reviews_permedia(media_id):
     sql = """
@@ -164,3 +189,51 @@ def get_users():
         ORDER BY username
     """
     return db.query(sql)
+
+def get_genres():
+    sql = """
+        SELECT id, name
+        FROM Genres
+        ORDER BY name
+    """
+    return db.query(sql)
+
+def add_media(name, description, release_year, mediatype_id, adder_id, genre_ids):
+    sql = """
+        INSERT INTO Media
+        (name, description, release_year, mediatype_id, adder_id, date_added)
+        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    """
+    db.execute(sql, [name, description, release_year, mediatype_id, adder_id])
+    media_id = db.last_insert_id()
+
+    sql = """
+        INSERT INTO Genrelist (media_id, genre_id)
+        VALUES (?, ?)
+    """
+    for genre_id in genre_ids:
+        db.execute(sql, [media_id, genre_id])
+
+    return media_id
+
+def get_genre_ids_by_media(media_id):
+    sql = """
+        SELECT genre_id
+        FROM Genrelist
+        WHERE media_id = ?
+    """
+    rows = db.query(sql, [media_id])
+    return [row["genre_id"] for row in rows]
+
+def update_genres(media_id, genre_ids):
+    # poista vanhat
+    sql = "DELETE FROM Genrelist WHERE media_id = ?"
+    db.execute(sql, [media_id])
+
+    # lisää uudet
+    sql = """
+        INSERT INTO Genrelist (media_id, genre_id)
+        VALUES (?, ?)
+    """
+    for genre_id in genre_ids:
+        db.execute(sql, [media_id, genre_id])

@@ -89,61 +89,81 @@ def show_media():
         abort(404)
     return render_template("listmedia.html", entries=entries)
 
-@app.route("/add")
+@app.route("/add", methods=["GET", "POST"])
 def add():
     if session.get("user_id") is None:
         abort(403)
-    return render_template("add.html")
 
-@app.route("/added", methods=["POST"])
-def added():
+    if request.method == "GET":
+        genres = dbfunctions.get_genres()
+        return render_template("add.html", genres=genres)
+
     entry_name = request.form["name"]
     entry_type = request.form["type"]
     entry_year = request.form["release_year"]
     entry_desc = request.form["description"]
+    genre_ids = request.form.getlist("genre_ids")
     added_by_user = session["user_id"]
 
     if not entry_name or not entry_type or not entry_year or not entry_desc:
-        return "All fields are required"
+        flash("All fields are required")
+        return redirect(url_for("add"))
 
     try:
-        sql = """
-            INSERT INTO Media
-            (name, description, release_year, mediatype_id, adder_id, date_added)
-            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        """
-        db.execute(sql, [entry_name, entry_desc, entry_year, entry_type, added_by_user])
+        dbfunctions.add_media(
+            entry_name,
+            entry_desc,
+            entry_year,
+            entry_type,
+            added_by_user,
+            genre_ids
+        )
 
         flash("Media entry added successfully")
         return redirect(url_for("index"))
-        
-    except sqlite3.IntegrityError:
-        abort(403)
+
+    except sqlite3.IntegrityError as e:
+        return f"Database error: {e}"
 
     except Exception as e:
-        flash(f"Error: {e}")
-        return redirect(url_for("add"))
+        return f"Error: {e}"
 
 @app.route("/edit/<int:entry_id>", methods=["GET", "POST"])
 def edit_entry(entry_id):
     entry = dbfunctions.get_entry(entry_id)
     if not entry:
         abort(404)
+
     if session.get("user_id") is None:
         abort(403)
+
     if entry["adder_id"] != session["user_id"]:
         abort(403)
 
     if request.method == "GET":
-        return render_template("edit.html", entry=entry)
- 
+        genres = dbfunctions.get_genres()
+        selected_genres = dbfunctions.get_genre_ids_by_media(entry_id)
+
+        return render_template(
+            "edit.html",
+            entry=entry,
+            genres=genres,
+            selected_genres=selected_genres
+        )
+
     if request.method == "POST":
         name = request.form["name"]
         description = request.form["description"]
         release_year = request.form["release_year"]
         mediatype_id = request.form["mediatype_id"]
+        genre_ids = request.form.getlist("genre_ids")
 
-        dbfunctions.update_entry(entry_id, name, description, release_year, mediatype_id)
+        dbfunctions.update_entry(
+            entry_id, name, description, release_year, mediatype_id
+        )
+
+        dbfunctions.update_genres(entry_id, genre_ids)
+
         return redirect(url_for("show_media"))
 
 @app.route("/remove/<int:entry_id>", methods=["GET", "POST"])
@@ -167,13 +187,22 @@ def remove_entry(entry_id):
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("query", "").strip()
+    genre_id = request.args.get("genre_id", "").strip()
 
-    if query:
-        entries = dbfunctions.search_entries(query)
+    genres = dbfunctions.get_genres()
+
+    if query or genre_id:
+        entries = dbfunctions.search_entries(query, genre_id if genre_id else None)
     else:
         entries = []
 
-    return render_template("search.html", query=query, entries=entries)
+    return render_template(
+        "search.html",
+        query=query,
+        genres=genres,
+        selected_genre_id=genre_id,
+        entries=entries
+    )
 
 @app.route("/addreview/<int:entry_id>", methods=["GET", "POST"])
 def add_review(entry_id):
