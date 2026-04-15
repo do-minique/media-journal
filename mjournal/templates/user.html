@@ -1,42 +1,53 @@
-<!DOCTYPE html>
-<html>
-<!-- This is the user page, where a list of added reviews is shown along with statistics related to the user -->
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Reviews</title>
-</head>
+{% extends "layout.html" %}
+
+{% block title %}Profile{% endblock %}
+
+
+{% block content %}
+
 
 <body>
-  <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Home</a>
-  </p>
-  </div>
+
   <div>
-    Profile: {{ user.username }}
+     <h3> Profile: {{ user.username }} </h3>
   </div>
-  <div class="content">
     <p>
-     Number of reviews: {{ reviews | count }}
+    <p>
+     Number of reviews: {{ review_count }}
      </p>
      <p>
-     Average score: {{ avg_rating }}
+     Average score: 
+     {% if avg_rating is not none %}
+  {{ "%.1f"|format(avg_rating) }} / 10
+{% else %}
+  No ratings
+{% endif %}
      </p>
+     </p>
+     <div class="cards">
     {% for review in reviews %}
-  <p class="entries"> 
-    {{ review.name }} {{ review.rating }}/10
-    {{ review.comment }} {{ review.date_added }} 
-  </p>
+  <div class="card databox"> 
+    <h3>{{ review.name }} </h3>
+    <p> <span class=data>Rating: {{ review.rating }}/10</span></p>
+    <p> <span class=data>Comment: {{ review.comment }} </span></p>
+    <p> <span class=data>Date: {{ review.date_added }} </span></p>
       {% if session.get("user_id") and review.user_id == session.get("user_id") %}
   <p>
     <a href="/editreview/{{ review.id }}">Edit</a> |
     <a href="/removereview/{{ review.id }}">Remove</a>
   </p>
+  
   {% endif %}
-  {% endfor %}
-
   </div>
-</body>
+  {% endfor %}
+</div>
+        <p>
+    <a href="/user/{{ user.id }}/{{ page - 1 }}">&lt;&lt;</a>
+    Page {{ page }}/{{ page_count }}
+    <a href="/user/{{ user.id }}/{{ page + 1 }}"">&gt;&gt;</a>
+  </p>
+  </div>
 
+</body>
+{% endblock %}
 </html>

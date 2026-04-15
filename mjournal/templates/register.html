@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html>
+{% extends "layout.html" %}
 
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Registration</title>
-</head>
+{% block title %}Register{% endblock %}
+
+
+{% block content %}
 
 <body>
-    <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Home</a>
-  </p>
-  </div>
   <div class="container">
     {% if error %}
       <div class="error">{{ error }}</div>
@@ -39,5 +32,5 @@
     </form>
   </div>
 </body>
-
+{% endblock %}
 </html>

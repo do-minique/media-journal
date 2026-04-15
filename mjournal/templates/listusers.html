@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html>
-<!-- This page shows a list of the created users -->
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Users</title>
-</head>
+{% extends "layout.html" %}
+
+{% block title %}Users{% endblock %}
+
+
+{% block content %}
 
 <body>
-  <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Home</a>
-  </p>
-  </div>
   <div class="content">
         <p>
 <!-- Add here a list of links to user profiles-->
@@ -23,8 +16,18 @@
             </li>
         {% endfor %}
   </p>
+<p>
+  {% if page > 1 %}
+    <a href="/listusers/{{ page - 1 }}">&lt;&lt;</a>
+  {% endif %}
 
+  Page {{ page }} / {{ page_count }}
+
+  {% if page < page_count %}
+    <a href="/listusers/{{ page + 1 }}">&gt;&gt;</a>
+  {% endif %}
+</p>
   </div>
 </body>
-
+{% endblock %}
 </html>

@@ -1,7 +1,9 @@
 import db
 
 
-def get_entries():
+def get_entries(page, page_size):
+    offset = (page - 1) * page_size
+
     sql = """
         SELECT
             Media.id,
@@ -11,15 +13,21 @@ def get_entries():
             Media.date_added,
             Media.adder_id,
             Mediatypes.name AS mediatype_name,
-            GROUP_CONCAT(Genres.name, ', ') AS genres
+            GROUP_CONCAT(Genres.name, ', ') AS genres,
+            (
+                SELECT ROUND(AVG(rating), 1)
+                FROM Reviews
+                WHERE Reviews.media_id = Media.id
+            ) AS avg_rating
         FROM Media
         JOIN Mediatypes ON Media.mediatype_id = Mediatypes.id
         LEFT JOIN Genrelist ON Media.id = Genrelist.media_id
         LEFT JOIN Genres ON Genrelist.genre_id = Genres.id
         GROUP BY Media.id
         ORDER BY Media.date_added DESC
+        LIMIT ? OFFSET ?
     """
-    return db.query(sql)
+    return db.query(sql, [page_size, offset])
 
 
 def get_entry(entry_id):
@@ -41,6 +49,11 @@ def get_entry(entry_id):
     """
     result = db.query(sql, (entry_id,))
     return result[0] if result else None
+
+def get_entry_count():
+    sql = "SELECT COUNT(*) AS count FROM Media"
+    result = db.query(sql)
+    return result[0]["count"]
    
 def update_entry(entry_id, name, description, release_year, mediatype_id):
     sql = """
@@ -62,7 +75,9 @@ def get_user(user_id):
     result = db.query(sql, [user_id])
     return result[0] if result else None
 
-def search_entries(query="", genre_id=None):
+def search_entries(query="", genre_id=None, min_rating=None, page=1, page_size=9):
+    offset = (page - 1) * page_size
+
     sql = """
         SELECT
             Media.id,
@@ -71,7 +86,12 @@ def search_entries(query="", genre_id=None):
             Media.description,
             Mediatypes.name AS mediatype_name,
             Users.username AS adder_username,
-            GROUP_CONCAT(Genres.name, ', ') AS genres
+            GROUP_CONCAT(DISTINCT Genres.name) AS genres,
+            (
+                SELECT ROUND(AVG(rating), 1)
+                FROM Reviews
+                WHERE Reviews.media_id = Media.id
+            ) AS avg_rating
         FROM Media
         JOIN Mediatypes ON Media.mediatype_id = Mediatypes.id
         JOIN Users ON Media.adder_id = Users.id
@@ -97,17 +117,72 @@ def search_entries(query="", genre_id=None):
         """)
         params.append(genre_id)
 
+    if min_rating:
+        conditions.append("""
+            (
+                SELECT AVG(rating)
+                FROM Reviews
+                WHERE Reviews.media_id = Media.id
+            ) >= ?
+        """)
+        params.append(min_rating)
+
     if conditions:
         sql += " WHERE " + " AND ".join(conditions)
 
     sql += """
         GROUP BY Media.id
         ORDER BY Media.name
+        LIMIT ? OFFSET ?
     """
+
+    params.extend([page_size, offset])
 
     return db.query(sql, params)
 
-def get_reviews_permedia(media_id):
+def search_entry_count(query="", genre_id=None, min_rating=None):
+    sql = """
+        SELECT COUNT(*) AS count
+        FROM Media
+    """
+
+    conditions = []
+    params = []
+
+    if query:
+        conditions.append("(Media.name LIKE ? OR Media.description LIKE ?)")
+        like = "%" + query + "%"
+        params.extend([like, like])
+
+    if genre_id:
+        conditions.append("""
+            Media.id IN (
+                SELECT media_id
+                FROM Genrelist
+                WHERE genre_id = ?
+            )
+        """)
+        params.append(genre_id)
+
+    if min_rating:
+        conditions.append("""
+            (
+                SELECT AVG(rating)
+                FROM Reviews
+                WHERE Reviews.media_id = Media.id
+            ) >= ?
+        """)
+        params.append(min_rating)
+
+    if conditions:
+        sql += " WHERE " + " AND ".join(conditions)
+
+    result = db.query(sql, params)
+    return result[0]["count"]
+
+def get_reviews_permedia(entry_id, page, page_size):
+    offset = (page - 1) * page_size
+
     sql = """
         SELECT
             Reviews.id,
@@ -121,10 +196,13 @@ def get_reviews_permedia(media_id):
         JOIN Users ON Reviews.user_id = Users.id
         WHERE Reviews.media_id = ?
         ORDER BY Reviews.date_added DESC
+        LIMIT ? OFFSET ?
     """
-    return db.query(sql, [media_id])
+    return db.query(sql, [entry_id, page_size, offset])
 
-def get_reviews_peruser(user_id):
+def get_reviews_peruser(user_id, page, page_size):
+    offset = (page - 1) * page_size
+
     sql = """
         SELECT
             Reviews.id,
@@ -134,14 +212,15 @@ def get_reviews_peruser(user_id):
             Reviews.comment,
             Reviews.date_added,
             Users.username,
-            Media.name
+            Media.name AS media_name
         FROM Reviews
         JOIN Users ON Reviews.user_id = Users.id
         JOIN Media ON Reviews.media_id = Media.id
         WHERE Reviews.user_id = ?
         ORDER BY Reviews.date_added DESC
+        LIMIT ? OFFSET ?
     """
-    return db.query(sql, [user_id])
+    return db.query(sql, [user_id, page_size, offset])
 
 def get_average_rating_peruser(user_id):
     sql = """
@@ -169,6 +248,24 @@ def get_review(review_id):
     result = db.query(sql, (review_id,))
     return result[0] if result else None
 
+def get_review_count_permedia(entry_id):
+    sql = """
+        SELECT COUNT(*) AS count
+        FROM Reviews
+        WHERE media_id = ?
+    """
+    result = db.query(sql, [entry_id])
+    return result[0]["count"]
+
+def get_review_count_peruser(user_id):
+    sql = """
+        SELECT COUNT(*) AS count
+        FROM Reviews
+        WHERE user_id = ?
+    """
+    result = db.query(sql, [user_id])
+    return result[0]["count"]
+
 def update_review(review_id, comment, rating):
     sql = """
         UPDATE Media
@@ -182,13 +279,21 @@ def delete_review(review_id):
     sql = "DELETE FROM Reviews WHERE id = ?"
     db.execute(sql, [review_id])
 
-def get_users():
+def get_users(page, page_size):
+    offset = (page - 1) * page_size
+
     sql = """
         SELECT id, username
         FROM Users
         ORDER BY username
+        LIMIT ? OFFSET ?
     """
-    return db.query(sql)
+    return db.query(sql, [page_size, offset])
+
+def get_user_count():
+    sql = "SELECT COUNT(*) AS count FROM Users"
+    result = db.query(sql)
+    return result[0]["count"]
 
 def get_genres():
     sql = """

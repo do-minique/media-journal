@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html>
-<!-- This page allows logged in users to add new entries -->
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Add entry</title>
-</head>
+{% extends "layout.html" %}
 
+{% block title %}New entry{% endblock %}
+
+
+{% block content %}
 <body>
-  <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Cancel</a>
-  </p>
-  </div>
   <div class="content">
 <!-- Form for adding entries-->
   <form action="/add" method="post">
@@ -44,5 +36,5 @@
   </form>
   </div>
 </body>
-
+{% endblock %}
 </html>

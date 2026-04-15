@@ -1,33 +1,32 @@
-<!DOCTYPE html>
-<html>
-<!-- This page shows a list of reviews added to each media -->
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Reviews</title>
-</head>
+{% extends "layout.html" %}
+
+{% block title %}Reviews{% endblock %}
+
+
+{% block content %}
 
 <body>
-  <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Home</a>
-  </p>
-  </div>
-  <div class="content">
+
+  <div class="cards">
     {% for review in reviews %}
-  <p class="entries"> 
-    {{ review.username }} {{ review.rating }}/10
-    {{ review.comment }} {{ review.date_added }} 
-  </p>
+  <div class="card databox"> 
+    <h3>Reviewer: {{ review.username }} </h3>
+    <p> <span class=data> Rating:<br> {{ review.rating }}/10 </span></p>
+    <p> <span class=data> Comment: <br>{{ review.comment }} </span></p>
+    <p> <span class=data> Review date:<br> {{ review.date_added }} </span></p>
       {% if session.get("user_id") and review.user_id == session.get("user_id") %}
-  <p>
     <a href="/editreview/{{ review.id }}">Edit</a> |
     <a href="/removereview/{{ review.id }}">Remove</a>
-  </p>
+  </div>
   {% endif %}
   {% endfor %}
 
   </div>
+      <p>
+    <a href="/listreviews_permedia/{{ entry.id }}/{{ page - 1 }}">&lt;&lt;</a>
+    Page {{ page }}/{{ page_count }}
+    <a href="/listreviews_permedia/{{ entry.id }}/{{ page + 1 }}"">&gt;&gt;</a>
+  </p>
 </body>
-
+{% endblock %}
 </html>

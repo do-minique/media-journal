@@ -1,37 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Media Journal</title>
-</head>
+{% extends "layout.html" %}
 
-<body>
-  <div class="top-right">
-    {% if session.user_id %}
-      Logged in as <a href="/user/{{ user.id }}">{{ user.username }}</a>
-    {% else %}
-      You are not logged in
-    {% endif %}
+{% block title %}Home{% endblock %}
 
-</div>
-  <div class="nav">
-    <ul>
-      {% if session.user_id %}
-      <li>
-        <a href="/logout">Log out</a>
-      </li>
-      {% else %}
-      <li>
-        <a href="/typelogin">Log in</a>
-      </li>
-      <li>
-        <a href="/register">Register</a>
-      </li>
-      {% endif %}
-    </ul>
-  </div>
 
-  <div class="content">
+{% block content %}
     <p>
       <a href="/listusers">View users</a>
     </p>
@@ -46,6 +18,5 @@
       <a href="/add">Add entry</a>
       {% endif %}
     </p>
-  </div>
-</body>
+{% endblock %}
 </html>

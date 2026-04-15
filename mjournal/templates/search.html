@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Search</title>
-</head>
+{% extends "layout.html" %}
+
+{% block title %}Search{% endblock %}
+
+
+{% block content %}
+
 <body>
-  <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Home</a>
-  </p>
-  </div>
+  <div class="search">
     <form action="/search" method="get">
         <input type="text" name="query" value="{{ query }}" placeholder="...">
             <select name="genre_id">
@@ -22,24 +18,49 @@
         </option>
       {% endfor %}
     </select>
-        <button type="submit">Search</button>
+<select name="min_rating">
+  <option value="">Any rating</option>
+  {% for i in range(2, 11) %}
+    <option value="{{ i }}"
+      {% if min_rating == i|string %}selected{% endif %}>
+      {{ i }}+
+    </option>
+  {% endfor %}
+</select>
+        <button type="submit">Search</button> <br>
     </form>
+    </div>
 
-  {% if query or selected_genre_id %}
+  {% if query or selected_genre_id or min_rating %}
     {% if entries %}
-      <ul>
+      <div class="cards"> 
         {% for entry in entries %}
-          <li>
-            <strong>{{ entry.name }}</strong> ({{ entry.release_year }})<br>
-            Type: {{ entry.mediatype_name }}<br>
-            Genres: {{ entry.genres if entry.genres else "No genres" }}<br>
-            Description: {{ entry.description }}<br>
-          </li>
+          <div class="card databox">
+            <h3>{{ entry.name }}</h3> 
+            <p> <span class=data>({{ entry.release_year }})</span></p>
+            <p> <span class=data>Type: {{ entry.mediatype_name }}</span></p>
+            <p> <span class=data>Genres: {{ entry.genres if entry.genres else "No genres" }}</span></p>
+            <p> <span class=data>Description: {{ entry.description }}</span></p>
+            <p> <span class=data>Average rating: {{ "%.1f"|format(entry.avg_rating) }}</span></p>
+          </div>
         {% endfor %}
-      </ul>
+      </div>
     {% else %}
       <p>No results</p>
     {% endif %}
+      <p>
+    {% if page > 1 %}
+      <a href="{{ url_for('search', page=page-1, query=query, genre_id=selected_genre_id, min_rating=min_rating) }}">&lt;&lt;</a>
+    {% endif %}
+
+    Page {{ page }}/{{ page_count }}
+
+    {% if page < page_count %}
+      <a href="{{ url_for('search', page=page+1, query=query, genre_id=selected_genre_id, min_rating=min_rating) }}">&gt;&gt;</a>
+    {% endif %}
+  </p>
   {% endif %}
+
 </body>
+{% endblock %}
 </html>

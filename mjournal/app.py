@@ -6,6 +6,7 @@ import db
 from datetime import datetime
 import config
 import dbfunctions
+import math
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -51,9 +52,8 @@ def create():
             username=username
         )
 
-    return render_template(
-        "register.html",
-        success="Account created! You can now log in."
+    flash("Account created! You can now log in.")
+    return redirect("/typelogin"
     )
 
 @app.route("/login", methods=["POST"])
@@ -62,32 +62,49 @@ def login():
     password = request.form["password"]
 
     user = db.query(
-        "SELECT id, password_hash FROM users WHERE username = ?",
+        "SELECT id, username, password_hash FROM users WHERE username = ?",
         (username,)
     )
 
     if len(user) == 0:
-        return render_template("index.html", error="ERROR: wrong username or password")
+        flash("Wrong username or password")
+        return redirect("/typelogin")
 
     user = user[0]
 
     if not check_password_hash(user["password_hash"], password):
-        return render_template("index.html", error="ERROR: wrong username or password")
+        flash("Wrong username or password")
+        return redirect("/typelogin")
 
     session["user_id"] = user["id"]
+    session["username"] = user["username"]
     return redirect("/")
 
 @app.route("/logout")
 def logout():
-    del session["user_id"]
+    session.clear()
     return redirect("/")
 
 @app.route("/listmedia")
-def show_media():
-    entries = dbfunctions.get_entries()
-    if not entries:
-        abort(404)
-    return render_template("listmedia.html", entries=entries)
+@app.route("/listmedia/<int:page>")
+def show_media(page=1):
+    page_size = 6
+    entry_count = dbfunctions.get_entry_count()
+    page_count = math.ceil(entry_count / page_size)
+    page_count = max(page_count, 1)
+
+    if page < 1:
+        return redirect("/listmedia/1")
+    if page > page_count:
+        return redirect("/listmedia/" + str(page_count))
+
+    entries = dbfunctions.get_entries(page, page_size)
+    return render_template(
+        "listmedia.html",
+        page=page,
+        page_count=page_count,
+        entries=entries
+    )
 
 @app.route("/add", methods=["GET", "POST"])
 def add():
@@ -185,14 +202,54 @@ def remove_entry(entry_id):
         return redirect(url_for("show_media"))
 
 @app.route("/search", methods=["GET"])
-def search():
+@app.route("/search/<int:page>", methods=["GET"])
+def search(page=1):
     query = request.args.get("query", "").strip()
     genre_id = request.args.get("genre_id", "").strip()
+    min_rating_str = request.args.get("min_rating", "").strip()
+
+    min_rating = None
+    if min_rating_str:
+        min_rating = float(min_rating_str)
 
     genres = dbfunctions.get_genres()
 
-    if query or genre_id:
-        entries = dbfunctions.search_entries(query, genre_id if genre_id else None)
+    page_size = 6
+    entry_count = dbfunctions.search_entry_count(
+        query,
+        genre_id if genre_id else None,
+        min_rating if min_rating else None
+    )
+
+    page_count = math.ceil(entry_count / page_size)
+    page_count = max(page_count, 1)
+
+    if page < 1:
+        return redirect(url_for(
+            "search",
+            page=1,
+            query=query,
+            genre_id=genre_id,
+            min_rating=min_rating
+        ))
+
+    if page > page_count:
+        return redirect(url_for(
+            "search",
+            page=page_count,
+            query=query,
+            genre_id=genre_id,
+            min_rating=min_rating
+        ))
+
+    if query or genre_id or min_rating:
+        entries = dbfunctions.search_entries(
+            query,
+            genre_id if genre_id else None,
+            min_rating if min_rating else None,
+            page,
+            page_size
+        )
     else:
         entries = []
 
@@ -201,7 +258,10 @@ def search():
         query=query,
         genres=genres,
         selected_genre_id=genre_id,
-        entries=entries
+        min_rating=min_rating,
+        entries=entries,
+        page=page,
+        page_count=page_count
     )
 
 @app.route("/addreview/<int:entry_id>", methods=["GET", "POST"])
@@ -238,12 +298,31 @@ def add_review(entry_id):
             return redirect(url_for("show_media"))
         
 @app.route("/listreviews_permedia/<int:entry_id>")
-def show_reviews(entry_id):
+@app.route("/listreviews_permedia/<int:entry_id>/<int:page>")
+def show_reviews(entry_id, page=1):
     entry = dbfunctions.get_entry(entry_id)
-    reviews = dbfunctions.get_reviews_permedia(entry_id)
-    if not reviews:
+    if not entry:
         abort(404)
-    return render_template("listreviews_permedia.html", reviews=reviews, entry=entry)
+
+    page_size = 9
+    review_count = dbfunctions.get_review_count_permedia(entry_id)
+    page_count = math.ceil(review_count / page_size)
+    page_count = max(page_count, 1)
+
+    if page < 1:
+        return redirect(f"/listreviews_permedia/{entry_id}/1")
+    if page > page_count:
+        return redirect(f"/listreviews_permedia/{entry_id}/{page_count}")
+
+    reviews = dbfunctions.get_reviews_permedia(entry_id, page, page_size)
+
+    return render_template(
+        "listreviews_permedia.html",
+        reviews=reviews,
+        entry=entry,
+        page=page,
+        page_count=page_count
+    )
 
 @app.route("/editreview/<int:review_id>", methods=["GET", "POST"])
 def edit_review(review_id):
@@ -284,15 +363,56 @@ def remove_review(review_id):
         return redirect(url_for("show_media"))
 
 @app.route("/user/<int:user_id>")
-def show_user(user_id):
+@app.route("/user/<int:user_id>/<int:page>")
+def show_user(user_id, page=1):
     user = dbfunctions.get_user(user_id)
     if not user:
         abort(404)
-    reviews = dbfunctions.get_reviews_peruser(user_id)
+
+    page_size = 6
+    review_count = dbfunctions.get_review_count_peruser(user_id)
+    page_count = math.ceil(review_count / page_size)
+    page_count = max(page_count, 1)
+
+    if page < 1:
+        return redirect(f"/user/{user_id}/1")
+    if page > page_count:
+        return redirect(f"/user/{user_id}/{page_count}")
+
+    reviews = dbfunctions.get_reviews_peruser(user_id, page, page_size)
     avg_rating = dbfunctions.get_average_rating_peruser(user_id)
-    return render_template("user.html", user=user, reviews=reviews, avg_rating=avg_rating)
+
+    return render_template(
+        "user.html",
+        user=user,
+        reviews=reviews,
+        avg_rating=avg_rating,
+        review_count=review_count,
+        page=page,
+        page_count=page_count
+    )
+
+import math
+from flask import render_template, redirect
 
 @app.route("/listusers")
-def list_users():
-    users = dbfunctions.get_users()
-    return render_template("listusers.html", users=users)
+@app.route("/listusers/<int:page>")
+def list_users(page=1):
+    page_size = 20
+    user_count = dbfunctions.get_user_count()
+    page_count = math.ceil(user_count / page_size)
+    page_count = max(page_count, 1)
+
+    if page < 1:
+        return redirect("/listusers/1")
+    if page > page_count:
+        return redirect(f"/listusers/{page_count}")
+
+    users = dbfunctions.get_users(page, page_size)
+
+    return render_template(
+        "listusers.html",
+        users=users,
+        page=page,
+        page_count=page_count
+    )

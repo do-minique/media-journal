@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html>
+{% extends "layout.html" %}
 
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Log In</title>
-</head>
+{% block title %}Log in{% endblock %}
+
+
+{% block content %}
 
 <body>
-    <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Home</a>
-  </p>
-  </div>
   <div class="container">
     {% if session.username %}
     <p>
@@ -43,7 +36,12 @@
       <a href="/register">Create an account</a>
     </p>
     {% endif %}
+      {% for message in get_flashed_messages() %}
+  <p>
+    <b>{{ message }}</b>
+  </p>
+  {% endfor %}
   </div>
 </body>
-
+{% endblock %}
 </html>

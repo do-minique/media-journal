@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html>
-<!-- This page allows logged in users to add new reviews -->
-<head>
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Add entry</title>
-</head>
+{% extends "layout.html" %}
+
+{% block title %}New review{% endblock %}
+
+
+{% block content %}
 
 <body>
-  <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Cancel</a>
-  </p>
-  </div>
   <div>
     <h1>{{ entry.name }}</h1>
   </div>
@@ -42,5 +35,5 @@
   </form>
   </div>
 </body>
-
+{% endblock %}
 </html>
