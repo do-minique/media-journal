@@ -17,6 +17,9 @@ With Media Journal, users can create a list of movies and series they have watch
 
 In this version, users can create an account and log in, add items when logged in, edit or delete the items they have added, and browse items added by all users. Users can also add/edit/remove reviews. Reviews and statistics can be viewed in user pages.
 
+Supported browsers: Google Chrome, Mozilla Firefox
+
+
 ### Known limitations
 
 Some other features are still under development.

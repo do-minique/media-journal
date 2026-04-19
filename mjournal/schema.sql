@@ -21,7 +21,7 @@ CREATE TABLE Media (
 
 CREATE TABLE Genres (
     id INTEGER PRIMARY KEY,
-    name TEXT
+    name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE Genrelist (
@@ -38,3 +38,12 @@ CREATE TABLE Reviews (
     comment TEXT,
     date_added TIMESTAMP
 );
+
+INSERT INTO Genres (name) VALUES
+  ('Fantasy'),
+  ('Scifi'),
+  ('Horror'),
+  ('Comedy'),
+  ('Romance'),
+  ('Drama'),
+  ('Action');
