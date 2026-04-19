@@ -7,6 +7,7 @@ from datetime import datetime
 import config
 import dbfunctions
 import math
+import secrets
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -78,6 +79,7 @@ def login():
 
     session["user_id"] = user["id"]
     session["username"] = user["username"]
+    session["csrf_token"] = secrets.token_hex(16)
     return redirect("/")
 
 @app.route("/logout")
@@ -115,6 +117,7 @@ def add():
         genres = dbfunctions.get_genres()
         return render_template("add.html", genres=genres)
 
+    check_csrf()
     entry_name = request.form["name"]
     entry_type = request.form["type"]
     entry_year = request.form["release_year"]
@@ -169,6 +172,7 @@ def edit_entry(entry_id):
         )
 
     if request.method == "POST":
+        check_csrf()
         name = request.form["name"]
         description = request.form["description"]
         release_year = request.form["release_year"]
@@ -197,6 +201,7 @@ def remove_entry(entry_id):
         return render_template("remove.html", entry=entry)
 
     if request.method == "POST":
+        check_csrf()
         if "continue" in request.form:
             dbfunctions.delete_entry(entry["id"])
         return redirect(url_for("show_media"))
@@ -272,6 +277,7 @@ def add_review(entry_id):
     if request.method == "GET":
         return render_template("addreview.html",entry=entry)
     if request.method == "POST":
+        check_csrf()
         entry_rating = request.form["rating"]
         entry_comment = request.form["comment"]
         added_by_user = session["user_id"]
@@ -338,6 +344,7 @@ def edit_review(review_id):
         return render_template("editreview.html", review=review)
  
     if request.method == "POST":
+        check_csrf()
         rating = request.form["rating"]
         comment = request.form["comment"]
 
@@ -358,6 +365,7 @@ def remove_review(review_id):
         return render_template("removereview.html", review=review)
 
     if request.method == "POST":
+        check_csrf()
         if "continue" in request.form:
             dbfunctions.delete_review(review["id"])
         return redirect(url_for("show_media"))
@@ -416,3 +424,8 @@ def list_users(page=1):
         page=page,
         page_count=page_count
     )
+
+def check_csrf():
+    print("FORM:", request.form)
+    if request.form.get("csrf_token") != session.get("csrf_token"):
+        abort(403)

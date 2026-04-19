@@ -40,6 +40,7 @@
       Description:
       <input type="text" name="description" value="{{ entry.description }}" required/>
     </p>
+     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Save changes" />
   </form>
   </div>

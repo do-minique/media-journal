@@ -31,6 +31,7 @@
 <textarea rows="10" cols="50" name="comment" required placeholder="Write your review here"></textarea>
 
     </p>
+     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Submit" />
   </form>
   </div>

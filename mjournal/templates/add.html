@@ -32,6 +32,7 @@
       <!--<input type="text" name="description" required/>-->
       <textarea rows="5" cols="25" name="description" required placeholder="Write a description here"></textarea>
     </p>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Submit" />
   </form>
   </div>
