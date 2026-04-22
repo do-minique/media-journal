@@ -8,6 +8,7 @@ import config
 import dbfunctions
 import math
 import secrets
+import markupsafe
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -429,3 +430,9 @@ def check_csrf():
     print("FORM:", request.form)
     if request.form.get("csrf_token") != session.get("csrf_token"):
         abort(403)
+
+@app.template_filter()
+def show_lines(content):
+    content = str(markupsafe.escape(content))
+    content = content.replace("\n", "<br />")
+    return markupsafe.Markup(content)

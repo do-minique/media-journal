@@ -29,7 +29,7 @@
   <div class="card databox"> 
     <h3>{{ review.name }} </h3>
     <p> <span class=data>Rating: {{ review.rating }}/10</span></p>
-    <p> <span class=data>Comment: {{ review.comment }} </span></p>
+    <p> <span class=data>Comment: {{ review.comment | show_lines }} </span></p>
     <p> <span class=data>Date: {{ review.date_added }} </span></p>
       {% if session.get("user_id") and review.user_id == session.get("user_id") %}
   <p>

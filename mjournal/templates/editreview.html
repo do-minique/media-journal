@@ -29,7 +29,7 @@
   {% endfor %}
 </select>
     <p>
-<textarea rows="10" cols="50" name="comment" required>{{ review.comment }}</textarea>
+<textarea rows="10" cols="50" id="comment" name="comment" required>{{ review.comment }}</textarea>
     </p>
      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Save changes" />

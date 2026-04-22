@@ -17,16 +17,16 @@
 
     <form action="/create" method="post">
       <p>
-        Username: <br />
-        <input type="text" name="username" value="{{ username or '' }}" />
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" value="{{ username or '' }}" />
       </p>
       <p>
-        Password: <br />
-        <input type="password" name="password1" />
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password1" />
       </p>
       <p>
-        Password again: <br />
-        <input type="password" name="password2" />
+        <label for="password2">Password again:</label><br>
+        <input type="password" id="password2" name="password2" />
       </p>
       <input type="submit" value="Create account" />
     </form>

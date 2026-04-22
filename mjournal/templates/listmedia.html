@@ -15,7 +15,7 @@
     <p> <span class=data>{{ entry.genres if entry.genres else "No genres" }}</span> </p>
     <p> <span class=data>Type: {{ entry.mediatype_name }}</span></p>
     <p> <span class=data> Release year: {{ entry.release_year }} </span></p>
-    <p> <span class=data> Description:<br> {{ entry.description }} </span></p>
+    <p> <span class=data> Description:<br> {{ entry.description | show_lines }} </span></p>
     <p> <span class=data>Average rating:      {% if entry.avg_rating is not none %}
   {{ "%.1f"|format(entry.avg_rating) }} / 10
 {% else %}
