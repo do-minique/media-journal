@@ -8,7 +8,7 @@
 <body>
   <div class="search">
     <form action="/search" method="get">
-        <input type="text" name="query" value="{{ query }}" placeholder="...">
+        <input type="text" name="query" value="{{ query }}" maxlength="100" placeholder="...">
             <select name="genre_id">
       <option value="">All genres</option>
       {% for genre in genres %}
@@ -29,6 +29,11 @@
 </select>
         <button type="submit">Search</button> <br>
     </form>
+            {% for message in get_flashed_messages() %}
+  <p>
+    <b>{{ message }}</b>
+  </p>
+  {% endfor %}
     </div>
 
   {% if query or selected_genre_id or min_rating %}

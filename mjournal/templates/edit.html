@@ -17,7 +17,7 @@
   <form action="/edit/{{ entry.id }}" method="post">
     <p>
       <label for="name">Name:</label>
-      <input type="text" id="name" name="name" value="{{ entry.name }}" required/>
+      <input type="text" id="name" name="name" value="{{ entry.name }}" maxlength="100" required/>
     </p>
     <label>
       <input type="radio" name="mediatype_id" value="1" {% if entry.mediatype_id == 1 %}checked{% endif %} required/> Book
@@ -38,12 +38,17 @@
 {% endfor %}
     <p>
       <label for="description">Description:</label>
-      <input type="text" id="description" name="description" value="{{ entry.description }}" required/>
+      <input type="text" id="description" name="description" value="{{ entry.description }}" maxlength="5000" required/>
     </p>
      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Save changes" />
   </form>
   </div>
+        {% for message in get_flashed_messages() %}
+  <p>
+    <b>{{ message }}</b>
+  </p>
+  {% endfor %}
 </body>
 {% endblock %}
 </html>

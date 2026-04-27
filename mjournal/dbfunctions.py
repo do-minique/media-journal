@@ -1,5 +1,8 @@
 import db
 
+def register_user(username, password_hash):
+    sql = "INSERT INTO Users (username, password_hash) VALUES (?, ?)"
+    db.execute(sql, [username, password_hash])
 
 def get_entries(page, page_size):
     offset = (page - 1) * page_size
@@ -75,7 +78,13 @@ def get_user(user_id):
     result = db.query(sql, [user_id])
     return result[0] if result else None
 
-def search_entries(query="", genre_id=None, min_rating=None, page=1, page_size=9):
+def get_user_by_name(username):
+    sql = "SELECT id, username, password_hash FROM users WHERE username = ?"
+    result = db.query(sql, (username,))
+
+    return result[0] if result else None
+
+def search_entries(query="", genre_id=None, min_rating=None, page=1, page_size=6):
     offset = (page - 1) * page_size
 
     sql = """
@@ -231,6 +240,15 @@ def get_average_rating_peruser(user_id):
     result = db.query(sql, [user_id])
     return result[0]["avg_rating"] if result else None
 
+def add_review(entry_id, added_by_user, entry_rating, entry_comment):
+    sql = """
+                INSERT INTO Reviews
+                (media_id, user_id, rating, comment, date_added)
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+            """
+    db.execute(sql, [entry_id, added_by_user, entry_rating, entry_comment])    
+    return review_id
+
 def get_review(review_id):
     sql = """
         SELECT
@@ -268,7 +286,7 @@ def get_review_count_peruser(user_id):
 
 def update_review(review_id, comment, rating):
     sql = """
-        UPDATE Media
+        UPDATE Reviews
         SET comment = ?, 
             rating = ?, 
         WHERE id = ?
@@ -331,11 +349,9 @@ def get_genre_ids_by_media(media_id):
     return [row["genre_id"] for row in rows]
 
 def update_genres(media_id, genre_ids):
-    # poista vanhat
     sql = "DELETE FROM Genrelist WHERE media_id = ?"
     db.execute(sql, [media_id])
 
-    # lisää uudet
     sql = """
         INSERT INTO Genrelist (media_id, genre_id)
         VALUES (?, ?)

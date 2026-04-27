@@ -18,15 +18,15 @@
     <form action="/create" method="post">
       <p>
         <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username" value="{{ username or '' }}" />
+        <input type="text" id="username" name="username" maxlength="50" value="{{ username or '' }}" />
       </p>
       <p>
         <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password1" />
+        <input type="password" id="password" maxlength="100" name="password1" />
       </p>
       <p>
         <label for="password2">Password again:</label><br>
-        <input type="password" id="password2" name="password2" />
+        <input type="password" id="password2" maxlength="100" name="password2" />
       </p>
       <input type="submit" value="Create account" />
     </form>

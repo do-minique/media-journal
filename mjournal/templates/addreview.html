@@ -28,13 +28,18 @@
   <option value="10">10</option>
 </select>
     <p>
-<textarea rows="10" cols="50" id="comment" name="comment" required placeholder="Write your review here"></textarea>
+<textarea rows="10" cols="50" id="comment" name="comment" required maxlength="5000" placeholder="Write your review here"></textarea>
 
     </p>
      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Submit" />
   </form>
   </div>
+          {% for message in get_flashed_messages() %}
+  <p>
+    <b>{{ message }}</b>
+  </p>
+  {% endfor %}
 </body>
 {% endblock %}
 </html>

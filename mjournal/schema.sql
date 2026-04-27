@@ -25,14 +25,14 @@ CREATE TABLE Genres (
 );
 
 CREATE TABLE Genrelist (
-    media_id INTEGER NOT NULL REFERENCES Media(id),
+    media_id INTEGER NOT NULL REFERENCES Media(id)  ON DELETE CASCADE,
     genre_id INTEGER NOT NULL REFERENCES Genres(id),
     PRIMARY KEY (media_id, genre_id)
 );
 
 CREATE TABLE Reviews (
     id INTEGER PRIMARY KEY,
-    media_id INTEGER NOT NULL REFERENCES Media(id),
+    media_id INTEGER NOT NULL REFERENCES Media(id) ON DELETE CASCADE,
     user_id INTEGER NOT NULL REFERENCES Users(id),
     rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 10),
     comment TEXT,

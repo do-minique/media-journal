@@ -41,12 +41,25 @@ def create():
             error="ERROR: passwords do not match",
             username=username
         )
+    
+    if len(username) > 50:
+        return render_template(
+            "register.html",
+            error="ERROR: Username is too long",
+            username=username
+        )
+
+    if len(password1) > 100 or len(password2) > 100:
+        return render_template(
+            "register.html",
+            error="ERROR: Password is too long",
+            username=username
+        )
 
     password_hash = generate_password_hash(password1)
 
     try:
-        sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
-        db.execute(sql, [username, password_hash])
+        dbfunctions.register_user(username, password_hash)
     except sqlite3.IntegrityError:
         return render_template(
             "register.html",
@@ -63,17 +76,16 @@ def login():
     username = request.form["username"]
     password = request.form["password"]
 
-    user = db.query(
-        "SELECT id, username, password_hash FROM users WHERE username = ?",
-        (username,)
-    )
+    user = dbfunctions.get_user_by_name(username)
 
     if len(user) == 0:
         flash("Wrong username or password")
         return redirect("/typelogin")
 
-    user = user[0]
+    #user = user[0]
 
+    #if not check_password_hash(user["password_hash"], password):
+    print("USER DEBUG:", user, type(user))
     if not check_password_hash(user["password_hash"], password):
         flash("Wrong username or password")
         return redirect("/typelogin")
@@ -129,6 +141,14 @@ def add():
     if not entry_name or not entry_type or not entry_year or not entry_desc:
         flash("All fields are required")
         return redirect(url_for("add"))
+    
+    if len(entry_name) > 100:
+        flash("Name is too long")
+        return redirect(url_for("add"))
+
+    if len(entry_desc) > 5000:
+        flash("Description is too long")
+        return redirect(url_for("add"))
 
     try:
         dbfunctions.add_media(
@@ -180,6 +200,18 @@ def edit_entry(entry_id):
         mediatype_id = request.form["mediatype_id"]
         genre_ids = request.form.getlist("genre_ids")
 
+        if not name or not description or not release_year or not mediatype_id:
+            flash("All fields are required")
+            return redirect((url_for("edit_entry", entry_id=entry_id)))
+    
+        if len(name) > 10:
+            flash("Name is too long")
+            return redirect((url_for("edit_entry", entry_id=entry_id)))
+
+        if len(description) > 5000:
+            flash("Description is too long")
+            return redirect((url_for("edit_entry", entry_id=entry_id)))
+
         dbfunctions.update_entry(
             entry_id, name, description, release_year, mediatype_id
         )
@@ -213,6 +245,10 @@ def search(page=1):
     query = request.args.get("query", "").strip()
     genre_id = request.args.get("genre_id", "").strip()
     min_rating_str = request.args.get("min_rating", "").strip()
+
+    if len(query) > 100:
+        flash("Query is too long")
+        return redirect((url_for("search")))
 
     min_rating = None
     if min_rating_str:
@@ -286,13 +322,13 @@ def add_review(entry_id):
         if not entry_rating or not entry_comment:
             return "All fields are required"
 
+        if len(entry_comment) > 5000:
+            flash("Comment is too long")
+            return redirect((url_for("add_review", entry_id=entry_id)))
+
+
         try:
-            sql = """
-                INSERT INTO Reviews
-                (media_id, user_id, rating, comment, date_added)
-                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-            """
-            db.execute(sql, [entry_id, added_by_user, entry_rating, entry_comment])
+            dbfunctions.add_review(entry_id, added_by_user, entry_rating, entry_comment)
 
             flash("Review entry added successfully")
             return redirect(url_for("index"))
@@ -348,6 +384,10 @@ def edit_review(review_id):
         check_csrf()
         rating = request.form["rating"]
         comment = request.form["comment"]
+
+        if len(comment) > 5000:
+            flash("Comment is too long")
+            return redirect((url_for("edit_review", review_id=review_id)))
 
         dbfunctions.update_review(review_id, comment, rating)
         return redirect(url_for("show_media"))

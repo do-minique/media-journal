@@ -10,7 +10,7 @@
   <form action="/add" method="post">
     <p>
       <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required/>
+      <input type="text" id="name" name="name" maxlength="100" required/>
     </p>
     <label>
       <input type="radio" name="type" value="1" required/> Book
@@ -19,7 +19,7 @@
     </label>
     <p>
       <label for="release_year">Release year:</label>
-      <input type="text" id="release_year" name="release_year" required/>
+      <input type="number" name="release_year" min="0" max="2100" required>
     </p>
       <p>Genres:</p>
   {% for genre in genres %}
@@ -30,12 +30,17 @@
   {% endfor %}
     <p>
       <label for="description">Description:</label><br>
-      <textarea rows="5" cols="25" id="description" name="description" required placeholder="Write a description here"></textarea>
+      <textarea rows="5" cols="25" id="description" name="description" required maxlength="5000" placeholder="Write a description here"></textarea>
     </p>
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
     <input type="submit" value="Submit" />
   </form>
   </div>
+        {% for message in get_flashed_messages() %}
+  <p>
+    <b>{{ message }}</b>
+  </p>
+  {% endfor %}
 </body>
 {% endblock %}
 </html>
