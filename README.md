@@ -20,15 +20,10 @@ In this version, users can create an account and log in, add items when logged i
 Supported browsers: Google Chrome, Mozilla Firefox
 
 
-### Known limitations
-
-Some other features are still under development.
-
 ### Setup instructions
 
 Before you begin, make sure you have the following installed:
 
-- Python with `venv`
 - Flask
 - SQLite
 
@@ -37,7 +32,7 @@ Testing the application requires first setting up a database on your local machi
 The database schema is stored in the file `schema.sql`. Create the database in a file named `database.db` as follows:
 
 ```bash
-$ sqlite3 database.db < schema.sql
+sqlite3 database.db < schema.sql
 ```
 
 
