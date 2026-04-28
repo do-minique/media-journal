@@ -17,8 +17,9 @@
       {% if session.get("user_id") and review.user_id == session.get("user_id") %}
     <a href="/editreview/{{ review.id }}">Edit</a> |
     <a href="/removereview/{{ review.id }}">Remove</a>
-  </div>
+  
   {% endif %}
+  </div>
   {% endfor %}
 
   </div>

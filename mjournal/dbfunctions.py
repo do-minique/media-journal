@@ -247,7 +247,6 @@ def add_review(entry_id, added_by_user, entry_rating, entry_comment):
                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
             """
     db.execute(sql, [entry_id, added_by_user, entry_rating, entry_comment])    
-    return review_id
 
 def get_review(review_id):
     sql = """

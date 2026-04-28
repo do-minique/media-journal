@@ -27,7 +27,7 @@
      <div class="cards">
     {% for review in reviews %}
   <div class="card databox"> 
-    <h3>{{ review.name }} </h3>
+    <h3>{{ review.media_name }} </h3>
     <p> <span class=data>Rating: {{ review.rating }}/10</span></p>
     <p> <span class=data>Comment: {{ review.comment | show_lines }} </span></p>
     <p> <span class=data>Date: {{ review.date_added }} </span></p>

@@ -21,13 +21,16 @@
 {% else %}
   No ratings </span></p>
     {% endif %}
+    <br>
     {% if session.get("user_id") and entry.adder_id == session.get("user_id") %}
     <p>
     <a href="/edit/{{ entry.id }}">Edit</a> |
     <a href="/remove/{{ entry.id }}">Remove</a>
   {% endif %}
+  {% if session.user_id %}
     <p>
     <a href="/addreview/{{ entry.id }}">Add a review</a> |
+    {% endif %}
     <a href="/listreviews_permedia/{{ entry.id }}">View reviews</a> 
   </p>
   </div>

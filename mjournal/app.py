@@ -78,7 +78,7 @@ def login():
 
     user = dbfunctions.get_user_by_name(username)
 
-    if len(user) == 0:
+    if user is None:
         flash("Wrong username or password")
         return redirect("/typelogin")
 

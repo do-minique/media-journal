@@ -29,11 +29,6 @@
 </select>
         <button type="submit">Search</button> <br>
     </form>
-            {% for message in get_flashed_messages() %}
-  <p>
-    <b>{{ message }}</b>
-  </p>
-  {% endfor %}
     </div>
 
   {% if query or selected_genre_id or min_rating %}
