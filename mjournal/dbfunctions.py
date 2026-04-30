@@ -57,7 +57,7 @@ def get_entry_count():
     sql = "SELECT COUNT(*) AS count FROM Media"
     result = db.query(sql)
     return result[0]["count"]
-   
+
 def update_entry(entry_id, name, description, release_year, mediatype_id):
     sql = """
         UPDATE Media
@@ -246,7 +246,7 @@ def add_review(entry_id, added_by_user, entry_rating, entry_comment):
                 (media_id, user_id, rating, comment, date_added)
                 VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
             """
-    db.execute(sql, [entry_id, added_by_user, entry_rating, entry_comment])    
+    db.execute(sql, [entry_id, added_by_user, entry_rating, entry_comment])
 
 def get_review(review_id):
     sql = """
@@ -287,7 +287,7 @@ def update_review(review_id, comment, rating):
     sql = """
         UPDATE Reviews
         SET comment = ?, 
-            rating = ?, 
+            rating = ?
         WHERE id = ?
     """
     db.execute(sql, (comment, rating, review_id))
