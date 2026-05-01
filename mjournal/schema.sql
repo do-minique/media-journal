@@ -39,6 +39,21 @@ CREATE TABLE Reviews (
     date_added TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_media_date_added
+ON Media(date_added DESC);
+
+CREATE INDEX idx_reviews_media_rating
+ON Reviews(media_id, rating);
+
+CREATE INDEX idx_reviews_media_date
+ON Reviews(media_id, date_added DESC);
+
+CREATE INDEX idx_reviews_user_date
+ON Reviews(user_id, date_added DESC);
+
+CREATE INDEX idx_genrelist_genre_media
+ON Genrelist(genre_id, media_id);
+
 INSERT INTO Mediatypes (id, name) VALUES
 (1, 'Book'),
 (2, 'Movie'),
