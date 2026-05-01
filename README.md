@@ -40,6 +40,52 @@ sqlite3 database.db < schema.sql
 
 ```bash
 flask run
+```
+
+### Performance
+
+The database was populated with 1000 users, 100 000 media entries and 100 000 reviews for performance testing purposes using the seed.py script. 
+
+Without indices, browsing media entries with large amounts of data took several seconds. For example, navigating from one page to another in the entry listing:
+```bash
+elapsed time: 1.29 s
+127.0.0.1 - - [01/May/2026 12:53:45] "GET /listmedia HTTP/1.1" 200 -
+elapsed time: 2.41 s
+127.0.0.1 - - [01/May/2026 12:53:49] "GET /listmedia/2 HTTP/1.1" 200 -
+elapsed time: 1.02 s
+127.0.0.1 - - [01/May/2026 12:53:55] "GET /listreviews_permedia/48300 HTTP/1.1" 200 -
+```
+
+The search function froze and did not complete within ten minutes, at which point I terminated the search.
+
+
+Indices added:
+```bash
+CREATE INDEX idx_media_date_added ON Media(date_added DESC);
+CREATE INDEX idx_reviews_media_id_rating ON Reviews(media_id, rating);
+CREATE INDEX idx_reviews_media_date ON Reviews(media_id, date_added DESC);
+CREATE INDEX idx_reviews_user_date ON Reviews(user_id, date_added DESC);
+CREATE INDEX idx_genrelist_genre_media ON Genrelist(genre_id, media_id);
+```
+
+
+After this, the listings open instantly:
+```bash
+elapsed time: 0.17 s
+127.0.0.1 - - [01/May/2026 13:07:54] "GET /listmedia HTTP/1.1" 200 -
+elapsed time: 0.17 s
+127.0.0.1 - - [01/May/2026 13:08:45] "GET /listmedia/100 HTTP/1.1" 200 -
+elapsed time: 0.02 s
+127.0.0.1 - - [01/May/2026 13:08:57] "GET /listreviews_permedia/48305 HTTP/1.1" 200 -
+
+```
+Search function:
+```bash
+elapsed time: 0.24 s
+127.0.0.1 - - [01/May/2026 13:10:48] "GET /search?query=&genre_id=4&min_rating=3 HTTP/1.1" 200 -
+```
+The test showed that adding indices significantly improved performance.
+
 
 
 
