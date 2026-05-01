@@ -1,14 +1,12 @@
 import sqlite3
-from flask import Flask
-from flask import redirect, render_template, request, session, flash, url_for, abort
-from werkzeug.security import generate_password_hash, check_password_hash
-import db
-from datetime import datetime
-import config
-import dbfunctions
 import math
 import secrets
 import markupsafe
+from flask import Flask
+from flask import redirect, render_template, request, session, flash, url_for, abort
+from werkzeug.security import generate_password_hash, check_password_hash
+import config
+import dbfunctions
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -41,7 +39,7 @@ def create():
             error="ERROR: passwords do not match",
             username=username
         )
-    
+
     if len(username) > 50:
         return render_template(
             "register.html",
@@ -141,7 +139,7 @@ def add():
     if not entry_name or not entry_type or not entry_year or not entry_desc:
         flash("All fields are required")
         return redirect(url_for("add"))
-    
+
     if len(entry_name) > 100:
         flash("Name is too long")
         return redirect(url_for("add"))
@@ -203,7 +201,7 @@ def edit_entry(entry_id):
         if not name or not description or not release_year or not mediatype_id:
             flash("All fields are required")
             return redirect((url_for("edit_entry", entry_id=entry_id)))
-    
+
         if len(name) > 10:
             flash("Name is too long")
             return redirect((url_for("edit_entry", entry_id=entry_id)))
@@ -332,14 +330,14 @@ def add_review(entry_id):
 
             flash("Review entry added successfully")
             return redirect(url_for("index"))
-        
+
         except sqlite3.IntegrityError:
             abort(403)
 
         except Exception as e:
             flash(f"Error: {e}")
             return redirect(url_for("show_media"))
-        
+
 @app.route("/listreviews_permedia/<int:entry_id>")
 @app.route("/listreviews_permedia/<int:entry_id>/<int:page>")
 def show_reviews(entry_id, page=1):
@@ -379,7 +377,7 @@ def edit_review(review_id):
 
     if request.method == "GET":
         return render_template("editreview.html", review=review)
- 
+
     if request.method == "POST":
         check_csrf()
         rating = request.form["rating"]
@@ -441,8 +439,6 @@ def show_user(user_id, page=1):
         page_count=page_count
     )
 
-import math
-from flask import render_template, redirect
 
 @app.route("/listusers")
 @app.route("/listusers/<int:page>")

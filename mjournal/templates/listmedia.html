@@ -8,40 +8,41 @@
 <body>
 
   <div class="content">
-          <div class="cards"> 
-    {% for entry in entries %}
-  <div class="card databox"> 
-    <h3> {{ entry.name }} </h3>
-    <p> <span class=data>{{ entry.genres if entry.genres else "No genres" }}</span> </p>
-    <p> <span class=data>Type: {{ entry.mediatype_name }}</span></p>
-    <p> <span class=data> Release year: {{ entry.release_year }} </span></p>
-    <p> <span class=data> Description:<br> {{ entry.description | show_lines }} </span></p>
-    <p> <span class=data>Average rating:      {% if entry.avg_rating is not none %}
-  {{ "%.1f"|format(entry.avg_rating) }} / 10
-{% else %}
-  No ratings </span></p>
-    {% endif %}
-    <br>
-    {% if session.get("user_id") and entry.adder_id == session.get("user_id") %}
+    <div class="cards"> 
+      {% for entry in entries %}
+        <div class="card databox"> 
+          <h3> {{ entry.name }} </h3>
+            <p> <span class=data>{{ entry.genres if entry.genres else "No genres" }}</span> </p>
+            <p> <span class=data>Type: {{ entry.mediatype_name }}</span></p>
+            <p> <span class=data> Release year: {{ entry.release_year }} </span></p>
+            <p> <span class=data> Description:<br> {{ entry.description | show_lines }} </span></p>
+            <p> <span class=data>Average rating:      {% if entry.avg_rating is not none %}
+            {{ "%.1f"|format(entry.avg_rating) }} / 10
+            {% else %}
+            No ratings </span></p>
+            {% endif %}
+            <br>
+            {% if session.get("user_id") and entry.adder_id == session.get("user_id") %}
+            <p>
+              <a href="/edit/{{ entry.id }}">Edit</a> |
+              <a href="/remove/{{ entry.id }}">Remove</a>
+            </p>
+            {% endif %}
+            {% if session.user_id %}
+            <p>
+              <a href="/addreview/{{ entry.id }}">Add a review</a> |
+              {% endif %}
+              <a href="/listreviews_permedia/{{ entry.id }}">View reviews</a> 
+            </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
     <p>
-    <a href="/edit/{{ entry.id }}">Edit</a> |
-    <a href="/remove/{{ entry.id }}">Remove</a>
-  {% endif %}
-  {% if session.user_id %}
-    <p>
-    <a href="/addreview/{{ entry.id }}">Add a review</a> |
-    {% endif %}
-    <a href="/listreviews_permedia/{{ entry.id }}">View reviews</a> 
-  </p>
-  </div>
-  {% endfor %}
-</div>
-  </div>
-    <p>
-    <a href="/listmedia/{{ page - 1 }}">&lt;&lt;</a>
-    Page {{ page }}/{{ page_count }}
-    <a href="/listmedia/{{ page + 1 }}">&gt;&gt;</a>
-  </p>
+      <a href="/listmedia/{{ page - 1 }}">&lt;&lt;</a>
+      Page {{ page }}/{{ page_count }}
+      <a href="/listmedia/{{ page + 1 }}">&gt;&gt;</a>
+    </p>
 </body>
 {% endblock %}
 

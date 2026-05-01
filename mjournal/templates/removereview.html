@@ -8,14 +8,14 @@
  
 <body>
   <div class="content">
- <form action="/removereview/{{ review.id }}" method="post">
-    <p>
-      This review will be deleted. Proceed?
-    </p>
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-    <input type="submit" name="continue" value="Yes, delete" />
-    <input type="submit" name="cancel" value="Cancel" />
-  </form>
-    </div>
+    <form action="/removereview/{{ review.id }}" method="post">
+      <p>
+        This review will be deleted. Proceed?
+      </p>
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+      <input type="submit" name="continue" value="Yes, delete" />
+      <input type="submit" name="cancel" value="Cancel" />
+    </form>
+  </div>
 </body>
 {% endblock %}

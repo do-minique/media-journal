@@ -95,7 +95,7 @@ def search_entries(query="", genre_id=None, min_rating=None, page=1, page_size=6
             Media.description,
             Mediatypes.name AS mediatype_name,
             Users.username AS adder_username,
-            GROUP_CONCAT(DISTINCT Genres.name) AS genres,
+            REPLACE(GROUP_CONCAT(DISTINCT Genres.name), ',', ', ') AS genres,
             (
                 SELECT ROUND(AVG(rating), 1)
                 FROM Reviews

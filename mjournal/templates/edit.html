@@ -7,42 +7,42 @@
 
 <body>
   <div class="nav">
-<!-- User can navigate back to the home page-->
-      <p>
-    <a href="/">Cancel</a>
-  </p>
+  <!-- User can navigate back to the home page-->
+    <p>
+      <a href="/">Cancel</a>
+    </p>
   </div>
   <div class="content">
-<!-- Form for editing entries-->
-  <form action="/edit/{{ entry.id }}" method="post">
-    <p>
-      <label for="name">Name:</label>
-      <input type="text" id="name" name="name" value="{{ entry.name }}" maxlength="100" required/>
-    </p>
-    <label>
-      <input type="radio" name="mediatype_id" value="1" {% if entry.mediatype_id == 1 %}checked{% endif %} required/> Book
-      <input type="radio" name="mediatype_id" value="2" {% if entry.mediatype_id == 2 %}checked{% endif %}/> Movie
-      <input type="radio" name="mediatype_id" value="3" {% if entry.mediatype_id == 3 %}checked{% endif %}/> TV show
-    </label>
-    <p>
-      <label for="release_year">Release year:</label>
-      <input type="text" id="release_year" name="release_year" value="{{ entry.release_year }}" required/>
-    </p>
-    <p>Genres:</p>
-{% for genre in genres %}
-  <label>
-    <input type="checkbox" name="genre_ids" value="{{ genre.id }}"
-      {% if genre.id in selected_genres %}checked{% endif %}>
-    {{ genre.name }}
-  </label><br>
-{% endfor %}
-    <p>
-      <label for="description">Description:</label>
-      <input type="text" id="description" name="description" value="{{ entry.description }}" maxlength="5000" required/>
-    </p>
-     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
-    <input type="submit" value="Save changes" />
-  </form>
+  <!-- Form for editing entries-->
+    <form action="/edit/{{ entry.id }}" method="post">
+      <p>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ entry.name }}" maxlength="100" required/>
+      </p>
+      <label>
+        <input type="radio" name="mediatype_id" value="1" {% if entry.mediatype_id == 1 %}checked{% endif %} required/> Book
+        <input type="radio" name="mediatype_id" value="2" {% if entry.mediatype_id == 2 %}checked{% endif %}/> Movie
+        <input type="radio" name="mediatype_id" value="3" {% if entry.mediatype_id == 3 %}checked{% endif %}/> TV show
+      </label>
+      <p>
+        <label for="release_year">Release year:</label>
+        <input type="text" id="release_year" name="release_year" value="{{ entry.release_year }}" required/>
+      </p>
+      <p>Genres:</p>
+      {% for genre in genres %}
+      <label>
+        <input type="checkbox" name="genre_ids" value="{{ genre.id }}"
+        {% if genre.id in selected_genres %}checked{% endif %}>
+        {{ genre.name }}
+      </label><br>
+      {% endfor %}
+      <p>
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" value="{{ entry.description }}" maxlength="5000" required/>
+      </p>
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+      <input type="submit" value="Save changes" />
+    </form>
   </div>
 </body>
 {% endblock %}

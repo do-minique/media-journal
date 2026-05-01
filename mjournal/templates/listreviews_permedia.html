@@ -14,20 +14,20 @@
     <p> <span class=data> Rating:<br> {{ review.rating }}/10 </span></p>
     <p> <span class=data> Comment: <br>{{ review.comment | show_lines }} </span></p>
     <p> <span class=data> Review date:<br> {{ review.date_added }} </span></p>
-      {% if session.get("user_id") and review.user_id == session.get("user_id") %}
+    {% if session.get("user_id") and review.user_id == session.get("user_id") %}
     <a href="/editreview/{{ review.id }}">Edit</a> |
     <a href="/removereview/{{ review.id }}">Remove</a>
-  
-  {% endif %}
+
+    {% endif %}
   </div>
-  {% endfor %}
+    {% endfor %}
 
   </div>
-      <p>
-    <a href="/listreviews_permedia/{{ entry.id }}/{{ page - 1 }}">&lt;&lt;</a>
-    Page {{ page }}/{{ page_count }}
-    <a href="/listreviews_permedia/{{ entry.id }}/{{ page + 1 }}"">&gt;&gt;</a>
-  </p>
+    <p>
+      <a href="/listreviews_permedia/{{ entry.id }}/{{ page - 1 }}">&lt;&lt;</a>
+      Page {{ page }}/{{ page_count }}
+      <a href="/listreviews_permedia/{{ entry.id }}/{{ page + 1 }}"">&gt;&gt;</a>
+    </p>
 </body>
 {% endblock %}
 </html>

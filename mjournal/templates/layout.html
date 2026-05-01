@@ -7,40 +7,39 @@
 </head>
 
 <body>
-<div class="topbar">
-  <div class="topbar-left">
-    {% if request.path != '/' %}
-      <a href="/">Home</a>
-      <a href="/" onclick="if (history.length > 1) { history.back(); return false; }">Back</a>
-    {% endif %}
-  </div>
-
-  <div class="topbar-center">
-    <span class="title">Media Journal</span>
-  </div>
-
-  <div class="topbar-right">
-    {% if session.get("user_id") %}
-    Logged in as
-      <a href="/user/{{ session.get('user_id') }}">{{ session.get("username") }}
-</a>
-      <a href="/logout">Log out</a>
-    {% else %}
-      {% if request.path != '/typelogin' and request.path != '/register' %}
-        <a href="/typelogin">Log in</a>
-        <a href="/register">Register</a>
+  <div class="topbar">
+    <div class="topbar-left">
+      {% if request.path != '/' %}
+        <a href="/">Home</a>
+        <a href="/" onclick="if (history.length > 1) { history.back(); return false; }">Back</a>
       {% endif %}
-    {% endif %}
+    </div>
+
+    <div class="topbar-center">
+      <span class="title">Media Journal</span>
+    </div>
+
+    <div class="topbar-right">
+      {% if session.get("user_id") %}
+      Logged in as
+      <a href="/user/{{ session.get('user_id') }}">{{ session.get("username") }}</a>
+      <a href="/logout">Log out</a>
+      {% else %}
+        {% if request.path != '/typelogin' and request.path != '/register' %}
+          <a href="/typelogin">Log in</a>
+          <a href="/register">Register</a>
+        {% endif %}
+      {% endif %}
+    </div>
   </div>
-</div>
 
   <div class="content">
     {% block content %}{% endblock %}
-            {% for message in get_flashed_messages() %}
-  <p>
-    <b>{{ message }}</b>
-  </p>
-  {% endfor %}
+    {% for message in get_flashed_messages() %}
+    <p>
+      <b>{{ message }}</b>
+    </p>
+    {% endfor %}
   </div>
 </body>
 

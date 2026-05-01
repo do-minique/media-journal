@@ -21,7 +21,7 @@
       <label for="release_year">Release year:</label>
       <input type="number" name="release_year" min="0" max="2100" required>
     </p>
-      <p>Genres:</p>
+    <p>Genres:</p>
   {% for genre in genres %}
     <label>
       <input type="checkbox" name="genre_ids" value="{{ genre.id }}">
@@ -36,11 +36,6 @@
     <input type="submit" value="Submit" />
   </form>
   </div>
-        {% for message in get_flashed_messages() %}
-  <p>
-    <b>{{ message }}</b>
-  </p>
-  {% endfor %}
 </body>
 {% endblock %}
 </html>

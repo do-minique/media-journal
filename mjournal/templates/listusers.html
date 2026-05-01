@@ -7,26 +7,25 @@
 
 <body>
   <div class="content">
-        <p>
-<!-- Add here a list of links to user profiles-->
- <h3>Registered users: </h3>
+    <p>
+      <h3>Registered users: </h3>
         {% for user in users %}
-            <li>
-                <a href="/user/{{ user.id }}">{{ user.username }}</a>
-            </li>
+          <li>
+            <a href="/user/{{ user.id }}">{{ user.username }}</a>
+          </li>
         {% endfor %}
-  </p>
-<p>
-  {% if page > 1 %}
-    <a href="/listusers/{{ page - 1 }}">&lt;&lt;</a>
-  {% endif %}
+    </p>
+    <p>
+      {% if page > 1 %}
+        <a href="/listusers/{{ page - 1 }}">&lt;&lt;</a>
+      {% endif %}
 
-  Page {{ page }} / {{ page_count }}
+      Page {{ page }} / {{ page_count }}
 
-  {% if page < page_count %}
-    <a href="/listusers/{{ page + 1 }}">&gt;&gt;</a>
-  {% endif %}
-</p>
+      {% if page < page_count %}
+      <a href="/listusers/{{ page + 1 }}">&gt;&gt;</a>
+      {% endif %}
+    </p>
   </div>
 </body>
 {% endblock %}

@@ -4,19 +4,19 @@
 
 
 {% block content %}
-    <p>
-      <a href="/listusers">View users</a>
-    </p>
-    <p>
-      <a href="/listmedia">View media entries</a>
-    </p>
-    <p>
-      <a href="/search">Search</a>
-    </p>
-    <p>
-      {% if session.user_id %}
-      <a href="/add">Add entry</a>
-      {% endif %}
-    </p>
+<p>
+  <a href="/listusers">View users</a>
+</p>
+<p>
+  <a href="/listmedia">View media entries</a>
+</p>
+<p>
+  <a href="/search">Search</a>
+</p>
+<p>
+  {% if session.user_id %}
+  <a href="/add">Add entry</a>
+  {% endif %}
+</p>
 {% endblock %}
 </html>
