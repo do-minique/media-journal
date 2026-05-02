@@ -41,7 +41,11 @@
       <p> <span class=data>Type: {{ entry.mediatype_name }}</span></p>
       <p> <span class=data>Genres: {{ entry.genres if entry.genres else "No genres" }}</span></p>
       <p> <span class=data>Description: {{ entry.description }}</span></p>
-      <p> <span class=data>Average rating: {{ "%.1f"|format(entry.avg_rating) }}</span></p>
+      <p> <span class=data>Average rating:      {% if entry.avg_rating is not none %}
+            {{ "%.1f"|format(entry.avg_rating) }} / 10
+            {% else %}
+            No ratings </span></p>
+            {% endif %}
     </div>
     {% endfor %}
   </div>
